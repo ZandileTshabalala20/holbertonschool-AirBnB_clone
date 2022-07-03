@@ -1,81 +1,104 @@
 #!/usr/bin/python3
-import unittest
+"""
+Unittests for file_storage
+"""
+import os
+import sys
 import pep8
-from models.engine.file_storage import FileStorage
-from models.__init__ import storage
+import unittest
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.engine.file_storage import FileStorage
 
 
-def setUpModule():
-    """ """
-    pass
+class Test_File_Storage(unittest.TestCase):
+    """
+    Test cases
+    """
+    def test_docstr(self):
+        """
+        Checks for comments
+        """
+        self.assertTrue(len(models.storage.__doc__) > 1)
+        self.assertTrue(len(models.storage.all.__doc__) > 1)
+        self.assertTrue(len(models.storage.new.__doc__) > 1)
+        self.assertTrue(len(models.storage.save.__doc__) > 1)
+        self.assertTrue(len(models.storage.reload.__doc__) > 1)
 
-
-def tearDownModule():
-    """ """
-    pass
-
-
-class TestStringMethods(unittest.TestCase):
-    """ Check the pep8 """
-    def testpep8(self):
+    def test_pep8(self):
+        """
+        Checks for pep8 styling
+        """
         style = pep8.StyleGuide(quiet=True)
-        file1 = "models/engine/file_storage.py"
-        file2 = "tests/test_models/test_engine/test_file_storage.py"
-        check = style.check_files([file1, file2])
-        self.assertEqual(check.total_errors, 0,
-                         "Found code style errors (and warning).")
+        pycode = style.check_files(["models/engine/file_storage.py"])
+        self.assertEqual(pycode.total_errors, 0, "fix pep8")
 
+    @classmethod
+    def setup_user(cls):
+        """
+        Checks User class configurations
+        """
+        cls.user = User()
+        cls.user.first_name = "Betty"
+        cls.user.last_name = "Holberton"
+        cls.user.email = "HBNB@Holbie.com"
+        cls.storage = FileStorage()
 
-class TestModels(unittest.TestCase):
-
-    def setUp(self):
-        """ Set a variable """
-        self.my_model = BaseModel()
-        self.fisto = FileStorage()
-        print("setUp")
+    @classmethod
+    def tearDown(cls):
+        """
+        Removes User class test
+        """
+        del cls.user
 
     def tearDown(self):
-        """ End variable """
-        print("tearDown")
+        """
+        Removes JSON file created in storage
+        """
+        try:
+            os.remove("file.json")
+        except FileNotFoundError:
+            pass
 
-    @classmethod
-    def setUpClass(cls):
-        """ Set a Class """
-        print("setUpClass")
+    def test_all(self):
+        """
+        Tests the all method
+        """
+        fs = FileStorage()
+        dict_1 = fs.all()
+        self.assertIsNotNone(dict_1)
+        self.assertEqual(type(dict_1), dict)
+        self.assertIs(dict_1, fs._FileStorage__objects)
 
-    @classmethod
-    def tearDownClass(cls):
-        """ Del a Class"""
-        print("tearDownClass")
+    def test_new(self):
+        """
+        Tests the new method
+        """
+        new_fs = FileStorage()
+        dict_2 = new_fs.all()
+        Holbie = User()
+        Holbie.id = 8888
+        Holbie.name = "Dennis"
+        new_fs.new(Dennis)
+        key = new_fs.__class__.__name__ + "." + str(new_fs.id)
+        self.assertIsNotNone(dict_2[key])
 
-    def test_file_storage_doc(self):
-        """ Check the documentation """
-        self.assertIsNotNone(FileStorage.__doc__)
-        self.assertIsNotNone(FileStorage.__init__.__doc__)
-        self.assertIsNotNone(FileStorage.all.__doc__)
-        self.assertIsNotNone(FileStorage.new.__doc__)
-        self.assertIsNotNone(FileStorage.save.__doc__)
-        self.assertIsNotNone(FileStorage.reload.__doc__)
+    def test_reload(self):
+        """
+        Tests the reload method
+        """
+        new_fs = FileStorage()
 
-    def test_fiel_storage_exist(self):
-        """ Check if methods exists """
-        self.assertTrue(hasattr(self.fisto, "__init__"))
-        self.assertTrue(hasattr(self.fisto, "all"))
-        self.assertTrue(hasattr(self.fisto, "new"))
-        self.assertTrue(hasattr(self.fisto, "save"))
-        self.assertTrue(hasattr(self.fisto, "reload"))
+        try:
+            os.remove("file.json")
+        except:
+            pass
 
-    def test_models_save(self):
-        """ Check if the save function works """
-        self.my_model.name = "Halo"
-        self.my_model.save()
-        storage.reload()
-        storage.all()
-        self.assertTrue(storage.all(), "Halo")
-        self.assertTrue(hasattr(self.my_model, 'save'))
-        self.assertNotEqual(self.my_model.created_at,
-                            self.my_model.updated_at)
-
-if __name__ == '__main__':
-    unittest.main()
+        with open("file.json", "w") as f:
+            f.write("{}")
+        with open("file.json", "r") as f:
+            for item in f:
+                self.assertEqual(item, "{}")
+        self.assertIs(new_fs.reload(), None)

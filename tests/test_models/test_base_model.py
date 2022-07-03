@@ -1,103 +1,100 @@
 #!/usr/bin/python3
+"""
+Unittests for BaseModel
+
+
+"""
 import unittest
-import pep8
 import os
-from models.__init__ import storage
+import pep8
 from models.base_model import BaseModel
-from models.engine.file_storage import FileStorage
 
 
-def setUpModule():
-    """ """
-    pass
+class Test_BaseModel(unittest.TestCase):
+    """
+    Tests for BaseModel
+    """
+    def test_docstring(self):
+        """
+        Checks for docstring
+        """
+        self.assertTrue(len(BaseModel.__doc__) > 1)
+        self.assertTrue(len(BaseModel.__init__.__doc__) > 1)
+        self.assertTrue(len(BaseModel.__str__.__doc__) > 1)
+        self.assertTrue(len(BaseModel.save.__doc__) > 1)
+        self.assertTrue(len(BaseModel.to_dict.__doc__) > 1)
 
-
-def tearDownModule():
-    """ """
-    pass
-
-
-class TestStringMethods(unittest.TestCase):
-    """ Check the pep8 """
-    def testpep8(self):
+    def test_pep8_basemodel(self):
+        """
+        tests pep8
+        """
         style = pep8.StyleGuide(quiet=True)
-        file1 = "models/base_model.py"
-        file2 = "tests/test_models/test_base_model.py"
-        check = style.check_files([file1, file2])
-        self.assertEqual(check.total_errors, 0,
-                         "Found code style errors (and warning).")
-
-
-class TestModels(unittest.TestCase):
-
-    def setUp(self):
-        """ Set a variable """
-        self.my_model = BaseModel()
-        self.my_model.my_number = 55
-        print("setUp")
-
-    def tearDown(self):
-        """ End variable """
-        print("tearDown")
+        pycode = style.check_files(['models/base_model.py'])
+        self.assertEqual(pycode.total_errors, 0, "fix pep8")
 
     @classmethod
-    def setUpClass(cls):
-        """ Set a Class """
-        print("setUpClass")
+    def setUp(cls):
+        """
+        Setup Test
+        """
+        cls.new_base = BaseModel()
+        cls.new_base.x = "x"
+        cls.new_base.y = 100
 
     @classmethod
-    def tearDownClass(cls):
-        """ Del a Class"""
-        print("tearDownClass")
+    def tearDown(cls):
+        """
+        Removes JSON file
+        """
+        try:
+            os.remove("file.json")
+        except:
+            pass
 
-    def test_models_doc(self):
-        """ Check the documentation """
-        self.assertIsNotNone(BaseModel.__doc__)
-        self.assertIsNotNone(BaseModel.__init__.__doc__)
-        self.assertIsNotNone(BaseModel.save.__doc__)
-        self.assertIsNotNone(BaseModel.__str__.__doc__)
-        self.assertIsNotNone(BaseModel.to_dict.__doc__)
+    def test_attribute_basemodel(self):
+        """
+        Checks if attributes exist
+        """
+        self.assertTrue(hasattr(BaseModel, "__init__"))
+        self.assertTrue(hasattr(BaseModel, "save"))
+        self.assertTrue(hasattr(BaseModel, "to_dict"))
 
-    def test_models_name(self):
-        """ Check if name is create"""
-        self.my_model.name = 'Holberton'
-        self.assertEqual(self.my_model.name, 'Holberton')
+    def test_init_arg(self):
+        """
+        Checks arg instance
+        """
+        new_base = BaseModel(8)
+        self.assertEqual(type(new_base).__name__, "BaseModel")
+        self.assertFalse(hasattr(new_base, "8"))
 
-    def test_models_number(self):
-        """ Check if the number is create """
-        self.assertEqual(self.my_model.my_number, 55)
+    def test_init_kwarg(self):
+        """
+        Checks kwarg instance
+        """
+        new_base = BaseModel(name="Betty")
+        self.assertEqual(type(new_base).__name__, "BaseModel")
+        self.assertTrue(hasattr(new_base, "name"))
+        self.assertTrue(hasattr(new_base, "__class__"))
+        self.assertFalse(hasattr(new_base, "id"))
+        self.assertFalse(hasattr(new_base, "created_at"))
+        self.assertFalse(hasattr(new_base, "updated_at"))
 
-    def test_models_exist(self):
-        """ Check if the json file and methods exists """
-        self.my_model.save()
-        self.assertTrue(os.path.isfile('file.json'))
-        self.assertTrue(hasattr(self.my_model, "__init__"))
-        self.assertTrue(hasattr(self.my_model, "__str__"))
-        self.assertTrue(hasattr(self.my_model, "save"))
-        self.assertTrue(hasattr(self.my_model, "to_dict"))
+    def test_save(self):
+        """
+        Test save method
+        """
+        self.new_base.save()
+        self.assertNotEqual(self.new_base.created_at, self.new_base.updated_at)
 
-    def test_models_not_empty(self):
-        """ Check if the json file is not empty """
-        self.assertTrue('file.json')
+    def test_to_dict(self):
+        """
+        Test to_dict method
+        """
+        copy = self.new_base.to_dict()
+        self.assertEqual(self.new_base.__class__.__name__, 'BaseModel')
+        self.assertIsInstance(copy['created_at'], str)
+        self.assertIsInstance(copy['updated_at'], str)
 
-    def test_models_save(self):
-        """ Check if the save function works """
-        a = self.my_model.updated_at()
-        self.my_model.save()
-        self.assertNotEqual(a, self.my_model.update_at)
-        self.assertNotEqual(self.my_model.created_at,
-                            self.my_model.updated_at)
 
-    def test_models_instance(self):
-        """ check if user_1 is instance of User """
-        self.assertIsInstance(self.my_model, BaseModel)
-
-    def test_models_to_dict(self):
-        model_1 = self.my_model.to_dict()
-        self.assertIsInstance(model_1["created_at"], str)
-        self.assertIsInstance(model_1["updated_at"], str)
-        self.assertIsInstance(model_1["my_number"], int)
-        self.assertIsInstance(model_1["id"], str)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
