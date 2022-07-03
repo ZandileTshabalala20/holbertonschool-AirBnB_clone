@@ -13,3 +13,8 @@ print("JSON of my_model:")
 for key in my_model_json.keys():
     print("\t{}: ({}) - {}".format(key, type(my_model_json[key]), my_model_json[key]))
 
+from models.engine.file_storage import FileStorage
+
+storage = FileStorage()
+storage.new(my_model)
+storage.save()

@@ -1,9 +1,5 @@
-#!/usr/bin/python3
-"""
-    The __init__.py file is used to perform import configurations.
-"""
-from models.engine import file_storage
+#!/usr/bin/env python3
 
-
-storage = file_storage.FileStorage()
+from models.engine.file_storage import FileStorage
+storage = FileStorage()
 storage.reload()
