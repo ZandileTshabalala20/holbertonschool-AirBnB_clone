@@ -1,20 +1,14 @@
 #!/usr/bin/python3
-"""
-City class that inherits from BaseModel
-"""
-
-
+""" class city """
 from models.base_model import BaseModel
+from models.state import State
 
 
 class City(BaseModel):
-    """
-    The City class that defines public class atribute
-    with two  empty strings
-    """
-
+    """ City class """
     state_id = ""
     name = ""
 
     def __init__(self, *args, **kwargs):
+        """ Init """
         super().__init__(*args, **kwargs)

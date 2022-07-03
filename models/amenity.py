@@ -1,15 +1,12 @@
-
 #!/usr/bin/python3
-# task 9
-
-"""create the class"""
-
-
+""" class amenity """
 from models.base_model import BaseModel
 
 
 class Amenity(BaseModel):
-    """create the class"""
+    """ Amenity class """
+    name = ""
 
-    name = ''
-
+    def __init__(self, *args, **kwargs):
+        """ Init """
+        super().__init__(*args, **kwargs)
